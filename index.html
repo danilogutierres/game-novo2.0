@@ -1,1 +1,727 @@
-# game-novo2.0
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Família Gutierres Games</title>
+<style>
+  :root {
+    --bg-dark: #0f172a;
+    --card-bg: #1e293b;
+    --accent: #f59e0b;
+    --text: #f8fafc;
+    --primary: #3b82f6;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    user-select: none;
+    -webkit-user-select: none;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  body {
+    background-color: var(--bg-dark);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Header e Identidade */
+  header {
+    width: 100%;
+    background: #020617;
+    padding: 12px 15px;
+    text-align: center;
+    border-bottom: 2px solid var(--accent);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  }
+
+  header h1 {
+    font-size: 1.4rem;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+
+  .player-selector {
+    margin-top: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .player-selector select {
+    padding: 5px 10px;
+    background: var(--card-bg);
+    color: var(--text);
+    border: 1px solid var(--primary);
+    border-radius: 5px;
+    font-size: 0.9rem;
+  }
+
+  .scoreboard {
+    font-size: 0.85rem;
+    color: #94a3b8;
+    margin-top: 4px;
+  }
+
+  /* Menu de Jogos */
+  nav {
+    display: flex;
+    gap: 8px;
+    padding: 10px;
+    width: 100%;
+    max-width: 500px;
+    overflow-x: auto;
+  }
+
+  nav button {
+    flex: 0 0 auto;
+    padding: 8px 14px;
+    background: var(--card-bg);
+    color: var(--text);
+    border: 1px solid #334155;
+    border-radius: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 0.85rem;
+  }
+
+  nav button.active {
+    background: var(--primary);
+    border-color: var(--primary);
+  }
+
+  /* Container Principal do Jogo */
+  main {
+    flex: 1;
+    width: 100%;
+    max-width: 450px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+  }
+
+  .game-wrapper {
+    width: 100%;
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    min-height: 420px;
+    justify-content: center;
+    position: relative;
+  }
+
+  canvas {
+    background: #000;
+    border-radius: 8px;
+    max-width: 100%;
+    display: block;
+  }
+
+  /* Controles Touch */
+  .touch-controls {
+    display: grid;
+    grid-template-columns: repeat(3, 50px);
+    grid-template-rows: repeat(2, 50px);
+    gap: 5px;
+    margin-top: 10px;
+  }
+
+  .touch-btn {
+    background: #334155;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    touch-action: manipulation;
+  }
+
+  .touch-btn:active {
+    background: var(--primary);
+  }
+
+  /* Jogo da Memória CSS */
+  .memory-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    width: 100%;
+    aspect-ratio: 1;
+  }
+
+  .card {
+    background: #334155;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: 2px solid var(--primary);
+  }
+
+  .card.flipped {
+    background: #0284c7;
+  }
+
+  .card svg {
+    width: 60%;
+    height: 60%;
+    display: none;
+  }
+
+  .card.flipped svg, .card.matched svg {
+    display: block;
+  }
+
+  .card.matched {
+    background: #15803d;
+    border-color: #22c55e;
+  }
+
+  /* Jogo da Tabuada */
+  .math-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+  }
+
+  .math-question {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--accent);
+  }
+
+  .math-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .math-btn {
+    padding: 15px;
+    font-size: 1.2rem;
+    background: #334155;
+    border: none;
+    color: white;
+    border-radius: 8px;
+  }
+
+  /* Ocultar elementos */
+  .hidden {
+    display: none !important;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Família Gutierres Games</h1>
+  <div class="player-selector">
+    <label for="playerSelect">Jogador:</label>
+    <select id="playerSelect" onchange="changePlayer()">
+      <option value="Jogador 1">Jogador 1</option>
+      <option value="Jogador 2">Jogador 2</option>
+      <option value="Jogador 3">Jogador 3</option>
+    </select>
+  </div>
+  <div class="scoreboard" id="scoreDisplay">Pontuação do Jogador: 0</div>
+</header>
+
+<nav>
+  <button id="btn-snake" class="active" onclick="switchGame('snake')">🐍 Cobra</button>
+  <button id="btn-runner" onclick="switchGame('runner')">⚡ Runner</button>
+  <button id="btn-memory" onclick="switchGame('memory')">🃏 Memória</button>
+  <button id="btn-tictactoe" onclick="switchGame('tictactoe')">❌⭕ Velha</button>
+  <button id="btn-target" onclick="switchGame('target')">🎯 Alvo</button>
+  <button id="btn-math" onclick="switchGame('math')">✖️ Tabuada</button>
+  <button id="btn-tetris" onclick="switchGame('tetris')">🧱 Tetris</button>
+</nav>
+
+<main>
+  <div class="game-wrapper">
+    <canvas id="gameCanvas" width="320" height="320"></canvas>
+
+    <!-- Estrutura Jogo da Memória -->
+    <div id="memoryBoard" class="memory-grid hidden"></div>
+
+    <!-- Estrutura Tabuada -->
+    <div id="mathBoard" class="math-container hidden">
+      <div class="math-question" id="mathQuestion">3 x 4 = ?</div>
+      <div class="math-options" id="mathOptions"></div>
+    </div>
+  </div>
+
+  <!-- D-Pad para Celular -->
+  <div id="dpad" class="touch-controls">
+    <div></div>
+    <button class="touch-btn" onclick="handleInput('UP')">▲</button>
+    <div></div>
+    <button class="touch-btn" onclick="handleInput('LEFT')">◄</button>
+    <button class="touch-btn" onclick="handleInput('DOWN')">▼</button>
+    <button class="touch-btn" onclick="handleInput('RIGHT')">►</button>
+  </div>
+</main>
+
+<script>
+  // Estado Global do App
+  let currentPlayer = "Jogador 1";
+  let scores = { "Jogador 1": 0, "Jogador 2": 0, "Jogador 3": 0 };
+  let currentGame = 'snake';
+  let gameLoopInterval = null;
+
+  const canvas = document.getElementById('gameCanvas');
+  const ctx = canvas.getContext('2d');
+
+  // Inicialização
+  function changePlayer() {
+    currentPlayer = document.getElementById('playerSelect').value;
+    updateScoreDisplay();
+  }
+
+  function addScore(pts) {
+    scores[currentPlayer] += pts;
+    updateScoreDisplay();
+  }
+
+  function updateScoreDisplay() {
+    document.getElementById('scoreDisplay').innerText = `Pontuação de ${currentPlayer}: ${scores[currentPlayer]}`;
+  }
+
+  function switchGame(game) {
+    currentGame = game;
+    clearInterval(gameLoopInterval);
+    document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+    document.getElementById(`btn-${game}`).classList.add('active');
+
+    // Visibilidade dos containers
+    canvas.classList.add('hidden');
+    document.getElementById('memoryBoard').classList.add('hidden');
+    document.getElementById('mathBoard').classList.add('hidden');
+    document.getElementById('dpad').style.display = 'none';
+
+    if (game === 'snake') {
+      canvas.classList.remove('hidden');
+      document.getElementById('dpad').style.display = 'grid';
+      initSnake();
+    } else if (game === 'runner') {
+      canvas.classList.remove('hidden');
+      initRunner();
+    } else if (game === 'memory') {
+      document.getElementById('memoryBoard').classList.remove('hidden');
+      initMemory();
+    } else if (game === 'tictactoe') {
+      canvas.classList.remove('hidden');
+      initTicTacToe();
+    } else if (game === 'target') {
+      canvas.classList.remove('hidden');
+      initTarget();
+    } else if (game === 'math') {
+      document.getElementById('mathBoard').classList.remove('hidden');
+      initMath();
+    } else if (game === 'tetris') {
+      canvas.classList.remove('hidden');
+      document.getElementById('dpad').style.display = 'grid';
+      initTetris();
+    }
+  }
+
+  function handleInput(dir) {
+    if (currentGame === 'snake' && window.snakeInput) window.snakeInput(dir);
+    if (currentGame === 'tetris' && window.tetrisInput) window.tetrisInput(dir);
+  }
+
+  // --- 1. SNAKE ---
+  function initSnake() {
+    const grid = 16;
+    let snake = [{x: 160, y: 160}, {x: 144, y: 160}];
+    let dx = grid, dy = 0;
+    let food = {x: 80, y: 80};
+
+    window.snakeInput = (dir) => {
+      if (dir === 'UP' && dy === 0) { dx = 0; dy = -grid; }
+      if (dir === 'DOWN' && dy === 0) { dx = 0; dy = grid; }
+      if (dir === 'LEFT' && dx === 0) { dx = -grid; dy = 0; }
+      if (dir === 'RIGHT' && dx === 0) { dx = grid; dy = 0; }
+    };
+
+    gameLoopInterval = setInterval(() => {
+      const head = {x: snake[0].x + dx, y: snake[0].y + dy};
+
+      if (head.x < 0 || head.x >= canvas.width || head.y < 0 || head.y >= canvas.height) {
+        alert("Fim de Jogo! Colisão na parede.");
+        initSnake();
+        return;
+      }
+
+      for (let segment of snake) {
+        if (head.x === segment.x && head.y === segment.y) {
+          alert("Fim de Jogo! Colisão com o corpo.");
+          initSnake();
+          return;
+        }
+      }
+
+      snake.unshift(head);
+
+      if (head.x === food.x && head.y === food.y) {
+        addScore(10);
+        food = {
+          x: Math.floor(Math.random() * (canvas.width/grid)) * grid,
+          y: Math.floor(Math.random() * (canvas.height/grid)) * grid
+        };
+      } else {
+        snake.pop();
+      }
+
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath();
+      ctx.arc(food.x + grid/2, food.y + grid/2, grid/2 - 2, 0, Math.PI * 2);
+      ctx.fill();
+
+      snake.forEach((seg, i) => {
+        ctx.fillStyle = i === 0 ? '#22c55e' : '#16a34a';
+        ctx.beginPath();
+        ctx.roundRect(seg.x, seg.y, grid-1, grid-1, 4);
+        ctx.fill();
+      });
+    }, 150);
+  }
+
+  // --- 2. RUNNER ---
+  function initRunner() {
+    let pikaY = 240, velocity = 0, gravity = 1.2;
+    let obstacleX = 320;
+    let isJumping = false;
+
+    const jump = () => {
+      if (!isJumping) { velocity = -15; isJumping = true; }
+    };
+
+    canvas.onclick = jump;
+
+    gameLoopInterval = setInterval(() => {
+      velocity += gravity;
+      pikaY += velocity;
+
+      if (pikaY >= 240) {
+        pikaY = 240;
+        isJumping = false;
+      }
+
+      obstacleX -= 6;
+      if (obstacleX < -20) {
+        obstacleX = 320;
+        addScore(5);
+      }
+
+      if (obstacleX < 60 && obstacleX > 20 && pikaY > 200) {
+        alert("Fim de Jogo! Pikachu atingiu o obstáculo.");
+        initRunner();
+        return;
+      }
+
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = '#334155';
+      ctx.fillRect(0, 280, canvas.width, 40);
+
+      ctx.fillStyle = '#facc15';
+      ctx.fillRect(30, pikaY, 30, 40);
+      ctx.fillStyle = '#ef4444';
+      ctx.fillRect(50, pikaY + 15, 6, 6);
+      ctx.fillStyle = '#000';
+      ctx.fillRect(30, pikaY - 10, 8, 10);
+
+      ctx.fillStyle = '#dc2626';
+      ctx.fillRect(obstacleX, 240, 20, 40);
+
+    }, 1000/30);
+  }
+
+  // --- 3. JOGO DA MEMÓRIA ---
+  function initMemory() {
+    const board = document.getElementById('memoryBoard');
+    board.innerHTML = '';
+    
+    const icons = [
+      '<svg viewBox="0 0 24 24" fill="white"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>',
+      '<svg viewBox="0 0 24 24" fill="white"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>',
+      '<svg viewBox="0 0 24 24" fill="white"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
+      '<svg viewBox="0 0 24 24" fill="white"><circle cx="12" cy="12" r="10"/></svg>'
+    ];
+
+    let cards = [...icons, ...icons].sort(() => Math.random() - 0.5);
+    let selected = [];
+
+    cards.forEach((svg, idx) => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = svg;
+      card.dataset.index = idx;
+      
+      card.onclick = () => {
+        if (selected.length < 2 && !card.classList.contains('flipped') && !card.classList.contains('matched')) {
+          card.classList.add('flipped');
+          selected.push({card, svg});
+
+          if (selected.length === 2) {
+            if (selected[0].svg === selected[1].svg) {
+              selected[0].card.classList.add('matched');
+              selected[1].card.classList.add('matched');
+              selected = [];
+              addScore(15);
+            } else {
+              setTimeout(() => {
+                selected[0].card.classList.remove('flipped');
+                selected[1].card.classList.remove('flipped');
+                selected = [];
+              }, 800);
+            }
+          }
+        }
+      };
+      board.appendChild(card);
+    });
+  }
+
+  // --- 4. JOGO DA VELHA ---
+  function initTicTacToe() {
+    let board = Array(9).fill(null);
+    let turn = 'X';
+
+    const drawBoard = () => {
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 4;
+
+      ctx.beginPath();
+      ctx.moveTo(106, 10); ctx.lineTo(106, 310);
+      ctx.moveTo(213, 10); ctx.lineTo(213, 310);
+      ctx.moveTo(10, 106); ctx.lineTo(310, 106);
+      ctx.moveTo(10, 213); ctx.lineTo(310, 213);
+      ctx.stroke();
+
+      board.forEach((val, i) => {
+        let x = (i % 3) * 106 + 53;
+        let y = Math.floor(i / 3) * 106 + 53;
+
+        if (val === 'X') {
+          ctx.strokeStyle = '#ef4444';
+          ctx.beginPath();
+          ctx.moveTo(x - 25, y - 25); ctx.lineTo(x + 25, y + 25);
+          ctx.moveTo(x + 25, y - 25); ctx.lineTo(x - 25, y + 25);
+          ctx.stroke();
+        } else if (val === 'O') {
+          ctx.strokeStyle = '#22c55e';
+          ctx.beginPath();
+          ctx.arc(x, y, 25, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+      });
+    };
+
+    canvas.onclick = (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      let col = Math.floor(x / 106);
+      let row = Math.floor(y / 106);
+      let idx = row * 3 + col;
+
+      if (!board[idx]) {
+        board[idx] = turn;
+        turn = turn === 'X' ? 'O' : 'X';
+        drawBoard();
+        checkWin();
+      }
+    };
+
+    const checkWin = () => {
+      const wins = [
+        [0,1,2],[3,4,5],[6,7,8],
+        [0,3,6],[1,4,7],[2,5,8],
+        [0,4,8],[2,4,6]
+      ];
+      wins.forEach(w => {
+        if (board[w[0]] && board[w[0]] === board[w[1]] && board[w[0]] === board[w[2]]) {
+          alert(`Jogador ${board[w[0]]} Venceu!`);
+          addScore(20);
+          initTicTacToe();
+        }
+      });
+    };
+
+    drawBoard();
+  }
+
+  // --- 5. JOGO DO ALVO ---
+  function initTarget() {
+    let target = {x: 160, y: 160, r: 25};
+
+    const drawTarget = () => {
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath();
+      ctx.arc(target.x, target.y, target.r, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(target.x, target.y, target.r * 0.6, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath();
+      ctx.arc(target.x, target.y, target.r * 0.2, 0, Math.PI * 2);
+      ctx.fill();
+    };
+
+    canvas.onclick = (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      let dist = Math.hypot(x - target.x, y - target.y);
+      if (dist < target.r) {
+        addScore(5);
+        target.x = Math.random() * (canvas.width - 60) + 30;
+        target.y = Math.random() * (canvas.height - 60) + 30;
+        drawTarget();
+      }
+    };
+
+    drawTarget();
+  }
+
+  // --- 6. TABUADA ---
+  function initMath() {
+    const qEl = document.getElementById('mathQuestion');
+    const optEl = document.getElementById('mathOptions');
+
+    let a = Math.floor(Math.random() * 9) + 1;
+    let b = Math.floor(Math.random() * 9) + 1;
+    let correct = a * b;
+
+    qEl.innerText = `${a} x ${b} = ?`;
+    optEl.innerHTML = '';
+
+    let options = [correct, correct + 2, correct - 3, correct + 5].sort(() => Math.random() - 0.5);
+
+    options.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.className = 'math-btn';
+      btn.innerText = opt;
+      btn.onclick = () => {
+        if (opt === correct) {
+          addScore(10);
+          initMath();
+        } else {
+          alert("Resposta Incorreta!");
+        }
+      };
+      optEl.appendChild(btn);
+    });
+  }
+
+  // --- 7. TETRIS RETRO ---
+  function initTetris() {
+    const cols = 10, rows = 20, sq = 16;
+    let grid = Array(rows).fill(null).map(() => Array(cols).fill(0));
+    
+    let piece = {
+      shape: [[1,1,1,1]],
+      x: 3, y: 0
+    };
+
+    window.tetrisInput = (dir) => {
+      if (dir === 'LEFT' && canMove(piece.x - 1, piece.y, piece.shape)) piece.x--;
+      if (dir === 'RIGHT' && canMove(piece.x + 1, piece.y, piece.shape)) piece.x++;
+      if (dir === 'DOWN') drop();
+    };
+
+    function canMove(nx, ny, shape) {
+      for (let r = 0; r < shape.length; r++) {
+        for (let c = 0; c < shape[r].length; c++) {
+          if (shape[r][c]) {
+            let x = nx + c;
+            let y = ny + r;
+            if (x < 0 || x >= cols || y >= rows || (y >= 0 && grid[y][x])) return false;
+          }
+        }
+      }
+      return true;
+    }
+
+    function drop() {
+      if (canMove(piece.x, piece.y + 1, piece.shape)) {
+        piece.y++;
+      } else {
+        piece.shape.forEach((r, ry) => {
+          r.forEach((val, rx) => {
+            if (val) grid[piece.y + ry][piece.x + rx] = 1;
+          });
+        });
+        addScore(10);
+        piece = { shape: [[1,1],[1,1]], x: 4, y: 0 };
+      }
+    }
+
+    gameLoopInterval = setInterval(() => {
+      drop();
+
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          if (grid[r][c]) {
+            ctx.fillStyle = '#3b82f6';
+            ctx.fillRect(c * sq, r * sq, sq - 1, sq - 1);
+          }
+        }
+      }
+
+      ctx.fillStyle = '#f59e0b';
+      piece.shape.forEach((r, ry) => {
+        r.forEach((val, rx) => {
+          if (val) ctx.fillRect((piece.x + rx) * sq, (piece.y + ry) * sq, sq - 1, sq - 1);
+        });
+      });
+
+    }, 500);
+  }
+
+  // Inicializar o primeiro jogo
+  switchGame('snake');
+</script>
+</body>
+</html>
+
