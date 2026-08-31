@@ -1,1 +1,2465 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<title>Família Gutierres Games</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    font-family:Arial,Helvetica,sans-serif;
+    background:
+        radial-gradient(circle at top,#183657 0,#07111f 48%,#030914 100%);
+    color:#fff;
+    min-height:100vh;
+    overflow-x:hidden;
+}
+
+header{
+    text-align:center;
+    padding:25px 12px 15px;
+}
+
+h1{
+    margin:0;
+    font-size:clamp(28px,8vw,48px);
+}
+
+h1 span{
+    color:#ffd43b;
+}
+
+.sub{
+    color:#9fb0c4;
+    margin-top:8px;
+}
+
+.container{
+    width:min(1050px,94%);
+    margin:auto;
+    padding-bottom:40px;
+}
+
+.player{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:8px;
+    flex-wrap:wrap;
+    margin:10px 0 22px;
+}
+
+.player input{
+    width:220px;
+    padding:12px 14px;
+    border-radius:12px;
+    border:1px solid #405873;
+    background:#102034;
+    color:#fff;
+    outline:none;
+}
+
+.btn,
+.card button,
+.controls button{
+    border:0;
+    border-radius:12px;
+    padding:12px 18px;
+    background:#ffd43b;
+    color:#111;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+#hello{
+    color:#ffd43b;
+    font-weight:bold;
+}
+
+#menu{
+    display:grid;
+    grid-template-columns:
+        repeat(auto-fit,minmax(230px,1fr));
+    gap:15px;
+}
+
+.card{
+    background:
+        linear-gradient(145deg,#142942,#0b1726);
+    border:1px solid #2b405a;
+    border-radius:20px;
+    padding:20px;
+    box-shadow:0 15px 45px #0007;
+}
+
+.icon{
+    font-size:46px;
+}
+
+.card h2{
+    margin-bottom:8px;
+}
+
+.card p{
+    color:#aebdce;
+    min-height:45px;
+    line-height:1.45;
+}
+
+.card button{
+    width:100%;
+    font-size:15px;
+}
+
+.game{
+    display:none;
+}
+
+.game.active{
+    display:block;
+}
+
+.panel{
+    background:
+        linear-gradient(145deg,#142942,#0b1726);
+    border:1px solid #2b405a;
+    border-radius:20px;
+    padding:18px;
+    box-shadow:0 15px 45px #0007;
+}
+
+.top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+}
+
+.top h2{
+    margin:5px 0 15px;
+}
+
+.back{
+    background:#26384e;
+    color:#fff;
+    border:0;
+    border-radius:10px;
+    padding:10px 14px;
+    cursor:pointer;
+}
+
+.score{
+    text-align:center;
+    font-weight:bold;
+    margin:12px;
+}
+
+.msg{
+    min-height:28px;
+    text-align:center;
+    font-weight:bold;
+}
+
+.controls{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+    margin:13px;
+}
+
+.tip{
+    text-align:center;
+    color:#7890a8;
+    font-size:13px;
+    margin-top:10px;
+}
+
+canvas{
+    display:block;
+    max-width:100%;
+    margin:auto;
+}
+
+#snakeCanvas{
+    width:min(400px,92vw);
+    border-radius:15px;
+    background:#082219;
+}
+
+#runnerCanvas{
+    width:100%;
+    border-radius:16px;
+    background:#73b9df;
+    touch-action:none;
+}
+
+.pad{
+    display:grid;
+    grid-template-columns:
+        repeat(3,72px);
+    gap:6px;
+    width:225px;
+    margin:15px auto;
+}
+
+.pad button{
+    height:62px;
+    background:#263b53;
+    color:white;
+    border:1px solid #435872;
+    border-radius:14px;
+    font-size:27px;
+    cursor:pointer;
+}
+
+.empty{
+    visibility:hidden;
+}
+
+/* JOGO DA VELHA */
+
+.board{
+    display:grid;
+    grid-template-columns:
+        repeat(3,85px);
+    gap:7px;
+    justify-content:center;
+    margin:15px auto;
+}
+
+.cell{
+    width:85px;
+    height:85px;
+    border:2px solid #405873;
+    border-radius:14px;
+    background:#16283d;
+    color:white;
+    font-size:42px;
+    cursor:pointer;
+}
+
+/* TABUADA */
+
+.question{
+    text-align:center;
+    font-size:45px;
+    font-weight:900;
+    margin:25px;
+}
+
+.answers{
+    display:grid;
+    grid-template-columns:
+        1fr 1fr;
+    gap:10px;
+    max-width:600px;
+    margin:auto;
+}
+
+.answers button{
+    padding:17px;
+    background:#263b53;
+    color:white;
+    border:0;
+    border-radius:13px;
+    font-size:20px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.records{
+    margin-top:20px;
+    padding:18px;
+    border-radius:18px;
+    background:#0d1b2b;
+    border:1px solid #24364c;
+}
+
+.record{
+    display:flex;
+    justify-content:space-between;
+    padding:9px 0;
+    border-bottom:1px solid #203044;
+}
+
+@media(max-width:500px){
+
+    .board{
+        grid-template-columns:
+            repeat(3,74px);
+    }
+
+    .cell{
+        width:74px;
+        height:74px;
+    }
+
+    .question{
+        font-size:38px;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+
+<h1>
+🎮 FAMÍLIA
+<span>GUTIERRES</span>
+GAMES
+</h1>
+
+<div class="sub">
+Jogos da família • diversão • desafios 🏆
+</div>
+
+</header>
+
+<div class="container">
+
+<div class="player">
+
+<input
+    id="playerName"
+    maxlength="20"
+    placeholder="Seu nome"
+>
+
+<button
+    class="btn"
+    onclick="savePlayer()"
+>
+Entrar
+</button>
+
+<span id="hello"></span>
+
+</div>
+
+
+<!-- MENU -->
+
+<div id="menu">
+
+<div class="card">
+
+<div class="icon">🐍</div>
+
+<h2>Cobra Real</h2>
+
+<p>
+Cobra com arena, fruta e visual melhorado.
+</p>
+
+<button
+    onclick="openGame('snake');startSnake()"
+>
+JOGAR
+</button>
+
+</div>
+
+
+<div class="card">
+
+<div class="icon">⚡</div>
+
+<h2>Pikachu Runner</h2>
+
+<p>
+Pikachu correndo por uma floresta,
+com pulo baixo ou alto.
+</p>
+
+<button
+    onclick="openGame('runner');startRunner()"
+>
+JOGAR
+</button>
+
+</div>
+
+
+<div class="card">
+
+<div class="icon">❌⭕</div>
+
+<h2>Jogo da Velha</h2>
+
+<p>
+Jogo da velha com animais.
+</p>
+
+<button
+    onclick="openGame('tic');startTic()"
+>
+JOGAR
+</button>
+
+</div>
+
+
+<div class="card">
+
+<div class="icon">✖️</div>
+
+<h2>Desafio da Tabuada</h2>
+
+<p>
+Resolva as multiplicações.
+</p>
+
+<button
+    onclick="openGame('math');startMath()"
+>
+JOGAR
+</button>
+
+</div>
+
+</div>
+
+
+<!-- COBRA -->
+
+<section
+    id="snake"
+    class="game"
+>
+
+<div class="panel">
+
+<div class="top">
+
+<h2>
+🐍 Cobra Real
+</h2>
+
+<button
+    class="back"
+    onclick="home()"
+>
+← Menu
+</button>
+
+</div>
+
+<canvas
+    id="snakeCanvas"
+    width="400"
+    height="400"
+></canvas>
+
+<div class="score">
+
+Pontos:
+<span id="snakeScore">
+0
+</span>
+
+</div>
+
+<div
+    id="snakeMsg"
+    class="msg"
+></div>
+
+<div class="controls">
+
+<button
+    onclick="startSnake()"
+>
+🔄 Jogar novamente
+</button>
+
+</div>
+
+<div class="pad">
+
+<span class="empty"></span>
+
+<button onclick="snakeDirection(0,-1)">
+▲
+</button>
+
+<span class="empty"></span>
+
+<button onclick="snakeDirection(-1,0)">
+◀
+</button>
+
+<button onclick="snakeDirection(0,1)">
+▼
+</button>
+
+<button onclick="snakeDirection(1,0)">
+▶
+</button>
+
+</div>
+
+<div class="tip">
+Setas para mover • ENTER reinicia depois de perder.
+</div>
+
+</div>
+
+</section>
+
+
+<!-- RUNNER -->
+
+<section
+    id="runner"
+    class="game"
+>
+
+<div class="panel">
+
+<div class="top">
+
+<h2>
+⚡ Pikachu Runner
+</h2>
+
+<button
+    class="back"
+    onclick="home()"
+>
+← Menu
+</button>
+
+</div>
+
+<canvas
+    id="runnerCanvas"
+    width="760"
+    height="340"
+></canvas>
+
+<div class="score">
+
+Pontos:
+<span id="runnerScore">
+0
+</span>
+
+•
+
+Recorde:
+<span id="runnerBest">
+0
+</span>
+
+</div>
+
+<div
+    id="runnerMsg"
+    class="msg"
+></div>
+
+<div class="controls">
+
+<button
+    id="jumpBtn"
+>
+⚡ SEGURE PARA PULAR
+</button>
+
+<button
+    onclick="startRunner()"
+>
+🔄 Jogar novamente
+</button>
+
+</div>
+
+<div class="tip">
+Toque rápido = pulo baixo •
+segure = pulo alto • ↑ / Espaço
+</div>
+
+</div>
+
+</section>
+
+
+<!-- JOGO DA VELHA -->
+
+<section
+    id="tic"
+    class="game"
+>
+
+<div class="panel">
+
+<div class="top">
+
+<h2>
+❌⭕ Jogo da Velha
+</h2>
+
+<button
+    class="back"
+    onclick="home()"
+>
+← Menu
+</button>
+
+</div>
+
+<p>
+Escolha os animais:
+</p>
+
+<div class="controls">
+
+<button
+    onclick="chooseCharacters('🐱','🐶')"
+>
+🐱 🐶
+</button>
+
+<button
+    onclick="chooseCharacters('🦊','🐼')"
+>
+🦊 🐼
+</button>
+
+<button
+    onclick="chooseCharacters('🦁','🐯')"
+>
+🦁 🐯
+</button>
+
+<button
+    onclick="chooseCharacters('🐸','🐵')"
+>
+🐸 🐵
+</button>
+
+</div>
+
+<div
+    id="ticMsg"
+    class="msg"
+>
+</div>
+
+<div
+    id="ticBoard"
+    class="board"
+></div>
+
+<div class="controls">
+
+<button
+    onclick="startTic()"
+>
+🔄 Jogar novamente
+</button>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- TABUADA -->
+
+<section
+    id="math"
+    class="game"
+>
+
+<div class="panel">
+
+<div class="top">
+
+<h2>
+✖️ Desafio da Tabuada
+</h2>
+
+<button
+    class="back"
+    onclick="home()"
+>
+← Menu
+</button>
+
+</div>
+
+<div class="score">
+
+Pontos:
+<span id="mathScore">
+0
+</span>
+
+</div>
+
+<div
+    id="mathQuestion"
+    class="question"
+>
+?
+</div>
+
+<div
+    id="mathAnswers"
+    class="answers"
+></div>
+
+<div
+    id="mathMsg"
+    class="msg"
+></div>
+
+<div class="controls">
+
+<button
+    onclick="startMath()"
+>
+🔄 Jogar novamente
+</button>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- RECORDES -->
+
+<div class="records">
+
+<h2>
+🏆 Recordes
+</h2>
+
+<div id="records"></div>
+
+</div>
+
+</div>
+
+
+<script>
+
+/* =========================
+   GERAL
+========================= */
+
+const $ = id =>
+    document.getElementById(id);
+
+let player =
+    localStorage.getItem("fg_player") || "";
+
+if(player){
+
+    $("playerName").value =
+        player;
+
+    $("hello").textContent =
+        "Olá, " + player + "! 👋";
+}
+
+function savePlayer(){
+
+    player =
+        $("playerName")
+        .value
+        .trim() ||
+        "Jogador";
+
+    localStorage.setItem(
+        "fg_player",
+        player
+    );
+
+    $("hello").textContent =
+        "Olá, " + player + "! 👋";
+
+    renderRecords();
+}
+
+function openGame(id){
+
+    $("menu").style.display =
+        "none";
+
+    document
+        .querySelectorAll(".game")
+        .forEach(game =>
+            game.classList.remove("active")
+        );
+
+    $(id).classList.add("active");
+
+    window.scrollTo(0,0);
+}
+
+function home(){
+
+    clearInterval(
+        snakeTimer
+    );
+
+    runnerPlaying = false;
+
+    if(runnerAnimation){
+
+        cancelAnimationFrame(
+            runnerAnimation
+        );
+
+        runnerAnimation = null;
+    }
+
+    document
+        .querySelectorAll(".game")
+        .forEach(game =>
+            game.classList.remove("active")
+        );
+
+    $("menu").style.display =
+        "grid";
+
+    window.scrollTo(0,0);
+}
+
+function saveScore(game,score){
+
+    let data =
+        JSON.parse(
+            localStorage.getItem(
+                "fg_" + game
+            ) || "{}"
+        );
+
+    const name =
+        player || "Jogador";
+
+    data[name] =
+        Math.max(
+            data[name] || 0,
+            score
+        );
+
+    localStorage.setItem(
+        "fg_" + game,
+        JSON.stringify(data)
+    );
+
+    renderRecords();
+}
+
+function renderRecords(){
+
+    const games = [
+
+        ["snake","🐍 Cobra"],
+
+        ["runner","⚡ Runner"],
+
+        ["tic","❌⭕ Velha"],
+
+        ["math","✖️ Tabuada"]
+
+    ];
+
+    const name =
+        player || "Jogador";
+
+    $("records").innerHTML =
+        games.map(game => {
+
+            const data =
+                JSON.parse(
+                    localStorage.getItem(
+                        "fg_" + game[0]
+                    ) || "{}"
+                );
+
+            return `
+                <div class="record">
+
+                    <span>
+                        ${game[1]}
+                    </span>
+
+                    <b>
+                        ${data[name] || 0}
+                    </b>
+
+                </div>
+            `;
+
+        }).join("");
+}
+
+
+/* =========================
+   COBRA
+========================= */
+
+const sc =
+    $("snakeCanvas")
+    .getContext("2d");
+
+let snake = [];
+
+let snakeFood = {};
+
+let snakeDir = {
+    x:1,
+    y:0
+};
+
+let snakeNext = {
+    x:1,
+    y:0
+};
+
+let snakeTimer = null;
+
+let snakePts = 0;
+
+let snakeDead = false;
+
+function startSnake(){
+
+    clearInterval(
+        snakeTimer
+    );
+
+    snakeDead = false;
+
+    snakePts = 0;
+
+    $("snakeScore")
+        .textContent = "0";
+
+    $("snakeMsg")
+        .textContent = "";
+
+    snake = [
+
+        {x:10,y:10},
+        {x:9,y:10},
+        {x:8,y:10},
+        {x:7,y:10},
+        {x:6,y:10}
+
+    ];
+
+    snakeDir = {
+        x:1,
+        y:0
+    };
+
+    snakeNext = {
+        x:1,
+        y:0
+    };
+
+    makeFood();
+
+    drawSnake();
+
+    snakeTimer =
+        setInterval(
+            moveSnake,
+            135
+        );
+}
+
+function snakeDirection(x,y){
+
+    if(snakeDead){
+        return;
+    }
+
+    if(
+        x === -snakeDir.x &&
+        y === -snakeDir.y
+    ){
+        return;
+    }
+
+    snakeNext = {
+        x:x,
+        y:y
+    };
+}
+
+function makeFood(){
+
+    do{
+
+        snakeFood = {
+
+            x:
+                1 +
+                Math.floor(
+                    Math.random()*18
+                ),
+
+            y:
+                1 +
+                Math.floor(
+                    Math.random()*18
+                )
+
+        };
+
+    }while(
+        snake.some(
+            part =>
+                part.x === snakeFood.x &&
+                part.y === snakeFood.y
+        )
+    );
+}
+
+function moveSnake(){
+
+    snakeDir =
+        snakeNext;
+
+    const head = {
+
+        x:
+            snake[0].x +
+            snakeDir.x,
+
+        y:
+            snake[0].y +
+            snakeDir.y
+
+    };
+
+    if(
+
+        head.x <= 0 ||
+
+        head.x >= 19 ||
+
+        head.y <= 0 ||
+
+        head.y >= 19 ||
+
+        snake.some(
+            (part,index) =>
+                index > 0 &&
+                part.x === head.x &&
+                part.y === head.y
+        )
+
+    ){
+
+        snakeDead = true;
+
+        clearInterval(
+            snakeTimer
+        );
+
+        $("snakeMsg")
+            .textContent =
+            "💥 Fim! ENTER ou Jogar novamente.";
+
+        saveScore(
+            "snake",
+            snakePts
+        );
+
+        return;
+    }
+
+    snake.unshift(head);
+
+    if(
+
+        head.x === snakeFood.x &&
+        head.y === snakeFood.y
+
+    ){
+
+        snakePts += 10;
+
+        $("snakeScore")
+            .textContent =
+            snakePts;
+
+        makeFood();
+
+    }else{
+
+        snake.pop();
+
+    }
+
+    drawSnake();
+}
+
+function drawSnake(){
+
+    sc.fillStyle =
+        "#082219";
+
+    sc.fillRect(
+        0,
+        0,
+        400,
+        400
+    );
+
+    sc.strokeStyle =
+        "#dbe9df";
+
+    sc.lineWidth = 9;
+
+    sc.strokeRect(
+        5,
+        5,
+        390,
+        390
+    );
+
+    const fx =
+        snakeFood.x * 20 + 10;
+
+    const fy =
+        snakeFood.y * 20 + 10;
+
+    sc.fillStyle =
+        "#e33131";
+
+    sc.beginPath();
+
+    sc.arc(
+        fx-5,
+        fy,
+        8,
+        0,
+        Math.PI*2
+    );
+
+    sc.arc(
+        fx+5,
+        fy,
+        8,
+        0,
+        Math.PI*2
+    );
+
+    sc.fill();
+
+    sc.fillStyle =
+        "#4caf50";
+
+    sc.beginPath();
+
+    sc.ellipse(
+        fx+6,
+        fy-9,
+        5,
+        2,
+        -.5,
+        0,
+        Math.PI*2
+    );
+
+    sc.fill();
+
+    snake.forEach(
+        (part,index) => {
+
+            const x =
+                part.x * 20 + 10;
+
+            const y =
+                part.y * 20 + 10;
+
+            const gradient =
+                sc.createRadialGradient(
+                    x-4,
+                    y-5,
+                    1,
+                    x,
+                    y,
+                    11
+                );
+
+            gradient.addColorStop(
+                0,
+                index === 0
+                    ? "#f0ff9a"
+                    : "#8eea92"
+            );
+
+            gradient.addColorStop(
+                1,
+                index % 2
+                    ? "#08664a"
+                    : "#075548"
+            );
+
+            sc.fillStyle =
+                gradient;
+
+            sc.beginPath();
+
+            sc.arc(
+                x,
+                y,
+                index === 0 ? 9 : 8,
+                0,
+                Math.PI*2
+            );
+
+            sc.fill();
+
+            sc.strokeStyle =
+                "#05382f";
+
+            sc.lineWidth = 1;
+
+            sc.stroke();
+
+            if(index === 0){
+
+                sc.fillStyle =
+                    "#111";
+
+                sc.beginPath();
+
+                sc.arc(
+                    x-3,
+                    y-3,
+                    2,
+                    0,
+                    Math.PI*2
+                );
+
+                sc.arc(
+                    x+4,
+                    y-3,
+                    2,
+                    0,
+                    Math.PI*2
+                );
+
+                sc.fill();
+
+            }
+
+        }
+    );
+}
+
+
+/* =========================
+   RUNNER
+========================= */
+
+const rc =
+    $("runnerCanvas")
+    .getContext("2d");
+
+let runnerPlaying = false;
+
+let runnerAnimation = null;
+
+let runnerY = 252;
+
+let runnerV = 0;
+
+let runnerScoreVal = 0;
+
+let runnerFrame = 0;
+
+let obstacles = [];
+
+let jumpHeld = false;
+
+let jumpStarted = false;
+
+let runnerBestVal =
+    Number(
+        localStorage.getItem(
+            "fg_runner_best"
+        ) || 0
+    );
+
+$("runnerBest").textContent =
+    runnerBestVal;
+
+function startRunner(){
+
+    if(runnerAnimation){
+
+        cancelAnimationFrame(
+            runnerAnimation
+        );
+    }
+
+    runnerPlaying = true;
+
+    runnerY = 252;
+
+    runnerV = 0;
+
+    runnerScoreVal = 0;
+
+    runnerFrame = 0;
+
+    obstacles = [];
+
+    jumpHeld = false;
+
+    jumpStarted = false;
+
+    $("runnerScore")
+        .textContent = "0";
+
+    $("runnerMsg")
+        .textContent = "";
+
+    runnerLoop();
+}
+
+function beginJump(){
+
+    if(
+        runnerPlaying &&
+        runnerY >= 251
+    ){
+
+        jumpHeld = true;
+
+        jumpStarted = true;
+
+        runnerV = -10.5;
+
+    }
+}
+
+function releaseJump(){
+
+    jumpHeld = false;
+
+}
+
+$("jumpBtn")
+.addEventListener(
+    "pointerdown",
+    event => {
+
+        event.preventDefault();
+
+        beginJump();
+
+    }
+);
+
+["pointerup","pointercancel","pointerleave"]
+.forEach(
+    type => {
+
+        $("jumpBtn")
+        .addEventListener(
+            type,
+            event => {
+
+                event.preventDefault();
+
+                releaseJump();
+
+            }
+        );
+
+    }
+);
+
+$("runnerCanvas")
+.addEventListener(
+    "pointerdown",
+    event => {
+
+        event.preventDefault();
+
+        beginJump();
+
+    }
+);
+
+$("runnerCanvas")
+.addEventListener(
+    "pointerup",
+    releaseJump
+);
+
+function runnerLoop(){
+
+    if(!runnerPlaying){
+        return;
+    }
+
+    runnerFrame++;
+
+    if(
+        jumpHeld &&
+        jumpStarted &&
+        runnerV < 0
+    ){
+
+        runnerV =
+            Math.max(
+                -14.5,
+                runnerV - .18
+            );
+
+    }else{
+
+        runnerV += .68;
+
+    }
+
+    runnerY += runnerV;
+
+    if(runnerY >= 252){
+
+        runnerY = 252;
+
+        runnerV = 0;
+
+        jumpStarted = false;
+
+    }
+
+    const speed =
+        5.3 +
+        Math.min(
+            3,
+            runnerScoreVal / 500
+        );
+
+    if(
+        runnerFrame > 65 &&
+        Math.random() < .032
+    ){
+
+        obstacles.push({
+
+            x:780,
+
+            width:
+                24 +
+                Math.random()*12,
+
+            height:
+                32 +
+                Math.random()*34
+
+        });
+
+    }
+
+    obstacles.forEach(
+        obstacle => {
+
+            obstacle.x -= speed;
+
+        }
+    );
+
+    obstacles =
+        obstacles.filter(
+            obstacle =>
+                obstacle.x > -70
+        );
+
+    for(
+        const obstacle of obstacles
+    ){
+
+        if(
+
+            110 > obstacle.x &&
+
+            88 <
+                obstacle.x +
+                obstacle.width &&
+
+            runnerY + 4 >
+                270 -
+                obstacle.height &&
+
+            runnerY - 46 <
+                270
+
+        ){
+
+            runnerGameOver();
+
+            return;
+
+        }
+
+    }
+
+    runnerScoreVal += .1;
+
+    $("runnerScore")
+        .textContent =
+        Math.floor(
+            runnerScoreVal
+        );
+
+    drawRunner();
+
+    runnerAnimation =
+        requestAnimationFrame(
+            runnerLoop
+        );
+}
+
+function runnerGameOver(){
+
+    runnerPlaying = false;
+
+    if(runnerAnimation){
+
+        cancelAnimationFrame(
+            runnerAnimation
+        );
+
+        runnerAnimation = null;
+
+    }
+
+    const score =
+        Math.floor(
+            runnerScoreVal
+        );
+
+    $("runnerMsg")
+        .textContent =
+        "💥 Pikachu caiu! ENTER ou Jogar novamente.";
+
+    if(score > runnerBestVal){
+
+        runnerBestVal = score;
+
+        localStorage.setItem(
+            "fg_runner_best",
+            score
+        );
+
+        $("runnerBest")
+            .textContent =
+            score;
+
+    }
+
+    saveScore(
+        "runner",
+        score
+    );
+}
+
+function drawTree(x,y){
+
+    rc.fillStyle =
+        "#62462e";
+
+    rc.fillRect(
+        x-8,
+        y,
+        16,
+        55
+    );
+
+    rc.fillStyle =
+        "#245f3b";
+
+    [
+        [-20,5,22],
+        [0,-10,30],
+        [22,5,22]
+    ].forEach(
+        part => {
+
+            rc.beginPath();
+
+            rc.arc(
+                x + part[0],
+                y + part[1],
+                part[2],
+                0,
+                Math.PI*2
+            );
+
+            rc.fill();
+
+        }
+    );
+}
+
+function drawPikachu(x,y){
+
+    rc.save();
+
+    rc.translate(
+        x,
+        y
+    );
+
+    rc.fillStyle =
+        "#e6b927";
+
+    rc.strokeStyle =
+        "#6b4709";
+
+    rc.lineWidth = 3;
+
+    /* CAUDA */
+
+    rc.beginPath();
+
+    rc.moveTo(24,5);
+
+    rc.lineTo(48,-12);
+
+    rc.lineTo(42,4);
+
+    rc.lineTo(58,12);
+
+    rc.lineTo(34,20);
+
+    rc.closePath();
+
+    rc.fill();
+
+    rc.stroke();
+
+    /* CORPO */
+
+    rc.fillStyle =
+        "#f4c62d";
+
+    rc.beginPath();
+
+    rc.ellipse(
+        0,
+        7,
+        27,
+        35,
+        0,
+        0,
+        Math.PI*2
+    );
+
+    rc.fill();
+
+    rc.stroke();
+
+    /* ORELHAS */
+
+    rc.beginPath();
+
+    rc.moveTo(-17,-15);
+
+    rc.lineTo(-35,-62);
+
+    rc.lineTo(-7,-46);
+
+    rc.closePath();
+
+    rc.fill();
+
+    rc.stroke();
+
+    rc.beginPath();
+
+    rc.moveTo(17,-15);
+
+    rc.lineTo(35,-62);
+
+    rc.lineTo(7,-46);
+
+    rc.closePath();
+
+    rc.fill();
+
+    rc.stroke();
+
+    /* PONTAS */
+
+    rc.fillStyle =
+        "#302719";
+
+    rc.beginPath();
+
+    rc.moveTo(-35,-62);
+
+    rc.lineTo(-27,-49);
+
+    rc.lineTo(-18,-53);
+
+    rc.closePath();
+
+    rc.fill();
+
+    rc.beginPath();
+
+    rc.moveTo(35,-62);
+
+    rc.lineTo(27,-49);
+
+    rc.lineTo(18,-53);
+
+    rc.closePath();
+
+    rc.fill();
+
+    /* OLHOS */
+
+    rc.fillStyle =
+        "#fff";
+
+    rc.beginPath();
+
+    rc.arc(
+        -9,
+        -24,
+        6,
+        0,
+        Math.PI*2
+    );
+
+    rc.arc(
+        9,
+        -24,
+        6,
+        0,
+        Math.PI*2
+    );
+
+    rc.fill();
+
+    rc.fillStyle =
+        "#111";
+
+    rc.beginPath();
+
+    rc.arc(
+        -9,
+        -23,
+        3,
+        0,
+        Math.PI*2
+    );
+
+    rc.arc(
+        9,
+        -23,
+        3,
+        0,
+        Math.PI*2
+    );
+
+    rc.fill();
+
+    /* BOCHECHAS */
+
+    rc.fillStyle =
+        "#e33";
+
+    rc.beginPath();
+
+    rc.arc(
+        -22,
+        -7,
+        7,
+        0,
+        Math.PI*2
+    );
+
+    rc.arc(
+        22,
+        -7,
+        7,
+        0,
+        Math.PI*2
+    );
+
+    rc.fill();
+
+    /* BOCA */
+
+    rc.strokeStyle =
+        "#6b4709";
+
+    rc.lineWidth = 2;
+
+    rc.beginPath();
+
+    rc.arc(
+        0,
+        -7,
+        7,
+        .15,
+        Math.PI-.15
+    );
+
+    rc.stroke();
+
+    /* BRAÇOS */
+
+    rc.beginPath();
+
+    rc.moveTo(-19,12);
+
+    rc.lineTo(-38,25);
+
+    rc.moveTo(19,12);
+
+    rc.lineTo(38,25);
+
+    rc.stroke();
+
+    /* PERNAS */
+
+    rc.beginPath();
+
+    rc.moveTo(-10,35);
+
+    rc.lineTo(-19,51);
+
+    rc.moveTo(10,35);
+
+    rc.lineTo(19,51);
+
+    rc.stroke();
+
+    rc.restore();
+}
+
+function drawRunner(){
+
+    const gradient =
+        rc.createLinearGradient(
+            0,
+            0,
+            0,
+            340
+        );
+
+    gradient.addColorStop(
+        0,
+        "#5aaee2"
+    );
+
+    gradient.addColorStop(
+        1,
+        "#e8f2d6"
+    );
+
+    rc.fillStyle =
+        gradient;
+
+    rc.fillRect(
+        0,
+        0,
+        760,
+        340
+    );
+
+    /* MONTANHAS */
+
+    rc.fillStyle =
+        "#4d825f";
+
+    rc.beginPath();
+
+    rc.moveTo(0,220);
+
+    rc.lineTo(110,125);
+
+    rc.lineTo(220,220);
+
+    rc.lineTo(350,110);
+
+    rc.lineTo(500,220);
+
+    rc.lineTo(630,125);
+
+    rc.lineTo(760,205);
+
+    rc.lineTo(760,270);
+
+    rc.lineTo(0,270);
+
+    rc.fill();
+
+    /* ÁRVORES */
+
+    for(
+        let x=30;
+        x<760;
+        x+=115
+    ){
+
+        drawTree(
+            x,
+            190
+        );
+
+    }
+
+    /* GRAMA */
+
+    rc.fillStyle =
+        "#39813f";
+
+    rc.fillRect(
+        0,
+        270,
+        760,
+        70
+    );
+
+    /* CAMINHO */
+
+    rc.fillStyle =
+        "#aa855b";
+
+    rc.fillRect(
+        0,
+        278,
+        760,
+        62
+    );
+
+    /* OBSTÁCULOS */
+
+    obstacles.forEach(
+        obstacle => {
+
+            rc.fillStyle =
+                "#654524";
+
+            rc.beginPath();
+
+            rc.roundRect(
+                obstacle.x,
+                270 -
+                obstacle.height,
+                obstacle.width,
+                obstacle.height,
+                5
+            );
+
+            rc.fill();
+
+            rc.fillStyle =
+                "#245f3b";
+
+            rc.beginPath();
+
+            rc.arc(
+                obstacle.x +
+                obstacle.width/2,
+                270 -
+                obstacle.height,
+                8,
+                0,
+                Math.PI*2
+            );
+
+            rc.fill();
+
+        }
+    );
+
+    drawPikachu(
+        88,
+        runnerY
+    );
+}
+
+
+/* =========================
+   JOGO DA VELHA
+========================= */
+
+let ticData =
+    Array(9).fill("");
+
+let ticA =
+    "🐱";
+
+let ticB =
+    "🐶";
+
+let ticTurn =
+    0;
+
+function chooseCharacters(a,b){
+
+    ticA = a;
+
+    ticB = b;
+
+    startTic();
+}
+
+function startTic(){
+
+    ticData =
+        Array(9).fill("");
+
+    ticTurn = 0;
+
+    $("ticMsg")
+        .textContent =
+        "Vez de " + ticA;
+
+    drawTic();
+}
+
+function drawTic(){
+
+    $("ticBoard")
+        .innerHTML = "";
+
+    ticData.forEach(
+        (value,index) => {
+
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+            button.className =
+                "cell";
+
+            button.textContent =
+                value;
+
+            button.onclick =
+                function(){
+                    playTic(index);
+                };
+
+            $("ticBoard")
+                .appendChild(
+                    button
+                );
+
+        }
+    );
+}
+
+function ticWin(){
+
+    const combinations = [
+
+        [0,1,2],
+        [3,4,5],
+        [6,7,8],
+
+        [0,3,6],
+        [1,4,7],
+        [2,5,8],
+
+        [0,4,8],
+        [2,4,6]
+
+    ];
+
+    return combinations.some(
+        combo => {
+
+            const a =
+                combo[0];
+
+            const b =
+                combo[1];
+
+            const c =
+                combo[2];
+
+            return (
+                ticData[a] &&
+                ticData[a] === ticData[b] &&
+                ticData[b] === ticData[c]
+            );
+
+        }
+    );
+}
+
+function playTic(index){
+
+    if(
+        ticData[index] ||
+        ticWin() ||
+        ticData.every(Boolean)
+    ){
+        return;
+    }
+
+    ticData[index] =
+        ticTurn
+            ? ticB
+            : ticA;
+
+    drawTic();
+
+    if(ticWin()){
+
+        $("ticMsg")
+            .textContent =
+            "🏆 " +
+            ticData[index] +
+            " venceu!";
+
+        saveScore(
+            "tic",
+            1
+        );
+
+        return;
+    }
+
+    if(ticData.every(Boolean)){
+
+        $("ticMsg")
+            .textContent =
+            "🤝 Empate!";
+
+        return;
+    }
+
+    ticTurn =
+        1 - ticTurn;
+
+    $("ticMsg")
+        .textContent =
+        "Vez de " +
+        (
+            ticTurn
+                ? ticB
+                : ticA
+        );
+}
+
+
+/* =========================
+   TABUADA
+========================= */
+
+let mathAnswer =
+    0;
+
+let mathPts =
+    0;
+
+function startMath(){
+
+    mathPts = 0;
+
+    $("mathScore")
+        .textContent =
+        "0";
+
+    $("mathMsg")
+        .textContent =
+        "";
+
+    nextMath();
+}
+
+function nextMath(){
+
+    const a =
+        2 +
+        Math.floor(
+            Math.random()*9
+        );
+
+    const b =
+        2 +
+        Math.floor(
+            Math.random()*9
+        );
+
+    mathAnswer =
+        a*b;
+
+    $("mathQuestion")
+        .textContent =
+        a +
+        " × " +
+        b +
+        " = ?";
+
+    const options =
+        [mathAnswer];
+
+    while(
+        options.length < 4
+    ){
+
+        const value =
+            Math.max(
+                1,
+                mathAnswer +
+                Math.floor(
+                    Math.random()*15
+                ) -
+                7
+            );
+
+        if(
+            !options.includes(value)
+        ){
+
+            options.push(value);
+
+        }
+
+    }
+
+    options.sort(
+        () =>
+            Math.random()-.5
+    );
+
+    $("mathAnswers")
+        .innerHTML =
+        options
+        .map(
+            value =>
+                `
+                <button
+                    onclick="answerMath(${value})"
+                >
+                    ${value}
+                </button>
+                `
+        )
+        .join("");
+}
+
+function answerMath(value){
+
+    if(
+        value === mathAnswer
+    ){
+
+        mathPts += 10;
+
+        $("mathScore")
+            .textContent =
+            mathPts;
+
+        $("mathMsg")
+            .textContent =
+            "✅ Acertou!";
+
+        saveScore(
+            "math",
+            mathPts
+        );
+
+        setTimeout(
+            nextMath,
+            300
+        );
+
+    }else{
+
+        $("mathMsg")
+            .textContent =
+            "❌ Resposta errada!";
+
+        setTimeout(
+            nextMath,
+            600
+        );
+
+    }
+}
+
+
+/* =========================
+   TECLADO
+========================= */
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        /* COBRA */
+
+        if(
+            $("snake")
+            .classList
+            .contains("active")
+        ){
+
+            if(
+                snakeDead &&
+                event.key === "Enter"
+            ){
+
+                event.preventDefault();
+
+                startSnake();
+
+                return;
+
+            }
+
+            if(
+                event.key === "ArrowUp"
+            ){
+
+                event.preventDefault();
+
+                snakeDirection(
+                    0,
+                    -1
+                );
+
+            }
+
+            if(
+                event.key === "ArrowDown"
+            ){
+
+                event.preventDefault();
+
+                snakeDirection(
+                    0,
+                    1
+                );
+
+            }
+
+            if(
+                event.key === "ArrowLeft"
+            ){
+
+                event.preventDefault();
+
+                snakeDirection(
+                    -1,
+                    0
+                );
+
+            }
+
+            if(
+                event.key === "ArrowRight"
+            ){
+
+                event.preventDefault();
+
+                snakeDirection(
+                    1,
+                    0
+                );
+
+            }
+
+        }
+
+
+        /* RUNNER */
+
+        if(
+            $("runner")
+            .classList
+            .contains("active")
+        ){
+
+            if(
+                (
+                    event.key === "ArrowUp" ||
+                    event.code === "Space"
+                ) &&
+                !event.repeat
+            ){
+
+                event.preventDefault();
+
+                beginJump();
+
+            }
+
+            if(
+                event.key === "Enter" &&
+                !runnerPlaying
+            ){
+
+                event.preventDefault();
+
+                startRunner();
+
+            }
+
+        }
+
+    }
+);
+
+
+document.addEventListener(
+    "keyup",
+    event => {
+
+        if(
+            event.key === "ArrowUp" ||
+            event.code === "Space"
+        ){
+
+            releaseJump();
+
+        }
+
+    }
+);
+
+
+/* =========================
+   INICIALIZAÇÃO
+========================= */
+
+renderRecords();
+
+startTic();
+
+</script>
+
+</body>
+</html>
